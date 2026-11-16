@@ -36,8 +36,14 @@ int connect_socket(const std::string& host, std::uint16_t port, std::atomic<bool
     if (status != 0) { error = gai_strerror(status); return -1; }
     int connected = -1;
     for (auto* addr = addresses; addr && !stop_requested; addr = addr->ai_next) {
-        const int fd = socket(addr->ai_family, addr->ai_socktype | SOCK_NONBLOCK, addr->ai_protocol);
+        const int fd = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
         if (fd < 0) continue;
+        const int flags = fcntl(fd, F_GETFL, 0);
+        if (flags < 0 || fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0) {
+            error = std::strerror(errno);
+            close(fd);
+            continue;
+        }
         const auto result = connect(fd, addr->ai_addr, addr->ai_addrlen);
         if (result == 0 || errno == EINPROGRESS) {
             pollfd candidate{fd, POLLOUT, 0};
