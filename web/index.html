@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Z-Wave Zniffer</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header><h1>Z-Wave Zniffer</h1><span id="service-status">Connecting…</span></header>
+  <nav id="tabs" role="tablist" aria-label="Trace sources">
+    <button id="add-tab" type="button" aria-haspopup="dialog" aria-label="Add source">+</button>
+  </nav>
+  <main>
+    <p id="empty">Select <strong>+</strong> to open a ZLF trace.</p>
+    <section id="trace" hidden>
+      <div class="toolbar"><span id="trace-status"></span><span id="trace-count"></span><label class="search-control">Find <input id="search-text" type="search" placeholder="Command, node, hex…"></label><button id="find-next" type="button">Next match</button><button id="edit-comment" type="button">Trace comment</button></div>
+      <div class="trace-layout">
+        <div class="trace-list">
+          <div class="table-wrap">
+            <table><thead><tr><th>#</th><th>Time</th><th>Type</th><th>Decoded</th><th>Home ID</th><th>Source</th><th>Destination</th><th>Session</th><th>Direction</th><th>Channel</th><th>RSSI</th><th>Bytes</th></tr></thead>
+              <tbody id="trace-rows"></tbody></table>
+          </div>
+          <div class="pager"><button id="prev-page" type="button">Previous</button><span id="page-label"></span><button id="next-page" type="button">Next</button></div>
+        </div>
+        <section class="details"><h2>Decoded fields from Z-Wave XML</h2><p id="detail-prompt">Select a trace row to see its frame and command fields.</p><div id="decoded-fields"></div><details id="raw-record" hidden><summary>Raw record</summary><pre id="trace-details"></pre></details></section>
+      </div>
+    </section>
+  </main>
+  <dialog id="source-dialog" aria-labelledby="source-heading">
+    <h2 id="source-heading">Add source</h2>
+    <button id="open-file" type="button">Open ZLF/ZWLF file</button>
+    <button id="connect-ip" type="button">Connect to IP device</button>
+    <form id="ip-form" hidden>
+      <label>Host or IP address <input id="ip-host" type="text" required autocomplete="off" placeholder="192.168.1.10"></label>
+      <label>TCP port <input id="ip-port" type="number" min="1" max="65535" value="4901" required></label>
+      <button type="submit">Start capture</button>
+    </form>
+    <button id="connect-serial" type="button">Connect to serial device</button>
+    <form id="serial-form" hidden>
+      <label>Container device path <input id="serial-device" type="text" required autocomplete="off" placeholder="/dev/ttyUSB0"></label>
+      <label>Baud rate <select id="serial-baud"><option>115200</option><option>230400</option></select></label>
+      <label>Zniffer protocol <select id="serial-version"><option value="4">4.x</option><option value="3">3.x (passive)</option></select></label>
+      <button type="submit">Start capture</button>
+    </form>
+    <p id="source-note" role="status"></p>
+    <button id="cancel-source" type="button">Cancel</button>
+  </dialog>
+  <dialog id="comment-dialog" aria-labelledby="comment-heading">
+    <h2 id="comment-heading">Trace comment</h2>
+    <textarea id="comment-text" rows="6" cols="45" maxlength="254"></textarea>
+    <p>Save a copy of the ZLF file on this computer with the updated comment.</p>
+    <button id="save-comment" type="button">Save copy</button>
+    <button id="cancel-comment" type="button">Cancel</button>
+  </dialog>
+  <input id="file-input" type="file" accept=".zlf,.zwlf" hidden>
+</body>
+</html>

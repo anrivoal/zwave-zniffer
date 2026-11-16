@@ -1,0 +1,38 @@
+{
+  "name": "zw-py-tools (Python)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.codex,target=/home/zwave/.codex,type=bind"
+  ],
+  "remoteUser": "zwave",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
+  "postStartCommand": "python3 .devcontainer/startup.py",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "Zniffer web server",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
+        "python.terminal.activateEnvironment": true
+      }
+    }
+  }
+}

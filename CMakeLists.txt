@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 3.20)
+project(zw_tools LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_library(zw_zlf STATIC src/zniffer/zlf.cpp src/zniffer/radio.cpp src/zniffer/mpdu.cpp src/zniffer/s2.cpp src/zniffer/s0.cpp src/zniffer/serial.cpp src/zniffer/basic_serial.cpp src/zniffer/capture.cpp src/zniffer/xml_commands.cpp)
+target_include_directories(zw_zlf PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_compile_options(zw_zlf PRIVATE -Wall -Wextra -Wpedantic)
+find_package(OpenSSL REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBXML2 REQUIRED IMPORTED_TARGET libxml-2.0)
+target_link_libraries(zw_zlf PUBLIC OpenSSL::Crypto PkgConfig::LIBXML2)
+
+add_executable(zlf_inspect src/zniffer/zlf_inspect.cpp)
+target_link_libraries(zlf_inspect PRIVATE zw_zlf)
+
+pkg_check_modules(LIBEVENT REQUIRED IMPORTED_TARGET libevent)
+find_package(Threads REQUIRED)
+add_executable(zniffer_service src/zniffer/service.cpp)
+target_link_libraries(zniffer_service PRIVATE zw_zlf PkgConfig::LIBEVENT Threads::Threads)
+target_compile_options(zniffer_service PRIVATE -Wall -Wextra -Wpedantic)
+
+include(CTest)
+if(BUILD_TESTING)
+  add_executable(zlf_tests tests/zlf_tests.cpp)
+  target_link_libraries(zlf_tests PRIVATE zw_zlf Threads::Threads)
+  target_compile_definitions(zlf_tests PRIVATE ZW_XML_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/assets/xml")
+  add_test(NAME zlf_tests COMMAND zlf_tests)
+endif()

@@ -1,0 +1,11 @@
+.git
+.devcontainer
+.repos
+docs
+tests
+trace.zlf
+*.zlf
+*.zwlf
+*-zniffer-keys.txt
+build
+node_modules
